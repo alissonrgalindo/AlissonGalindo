@@ -1,0 +1,36 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap');
+
+body {
+    background: white;
+    margin: 0;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 400;
+    font-size: 18px;
+    overflow: hidden;
+    cursor: none;
+}
+
+a {
+    font-weight: 500;
+    text-decoration: none;
+    color: black;
+    &:not([href*="tel:"]) {
+        font-weight: 700
+    }
+}
+
+address {
+    font-weight: 500;
+    font-style: normal;
+    margin-top: 60px;
+    @media (max-width: 767px) {
+        margin-top: 40px;
+    }
+}
+
+@import "cursor";
+@import "font";
+@import "base";
+@import "hero";
+@import "resume";
+@import "image";

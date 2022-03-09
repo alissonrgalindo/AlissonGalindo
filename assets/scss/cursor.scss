@@ -1,0 +1,16 @@
+.cursor {
+  position: fixed;
+  opacity: 0;
+  pointer-events: none;
+  mix-blend-mode: difference;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background-color: white;
+  transition: transform 350ms ease;
+  transform: translate(-50%, -50%) scale(0.3);
+  z-index: 1000;
+  &--link {
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
