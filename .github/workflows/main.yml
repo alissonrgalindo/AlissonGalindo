@@ -17,3 +17,4 @@ jobs:
           server: ${{ secrets.alison_serve }}
           username: ${{ secrets.alison_user }}
           password: ${{ secrets.alison_pw }}
+          server-dir: public_html/
