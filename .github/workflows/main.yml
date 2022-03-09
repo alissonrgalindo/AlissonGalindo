@@ -14,7 +14,7 @@ jobs:
       - name: 📂 Sync files
         uses: SamKirkland/FTP-Deploy-Action@4.0.0
         with:
-          server: ${{ secrets.alison_serve }}
+          server: ${{ secrets.alison_server }}
           username: ${{ secrets.alison_user }}
           password: ${{ secrets.alison_pw }}
           server-dir: public_html/
