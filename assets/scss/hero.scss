@@ -34,7 +34,7 @@
         }
        &::after {
             animation-name: glitch;
-            animation-duration: 4s;
+            animation-duration: 2s;
             animation-delay: 2s;
             left: 4px;
             text-shadow: -1px 0 #ffa800;
@@ -43,7 +43,7 @@
           
          &::before {
             animation-name: glitch-2;
-            animation-duration: 6s;
+            animation-duration: 4s;
             animation-delay: 2s;
             left: -4px;
             text-shadow: 1px 0 #00d8ff;
