@@ -23,4 +23,4 @@ jobs:
           server: ${{ secrets.alison_server }}
           username: ${{ secrets.alison_user }}
           password: ${{ secrets.alison_pw }}
-          local-dir: build/
+          server-dir: public_html/
