@@ -13,7 +13,7 @@ jobs:
 
         # Runs a single command using the runners shell
       - name: Run react build script
-        run: yarn && yarn build
+        run: npm && npm build
         env:
           CI: false
 
