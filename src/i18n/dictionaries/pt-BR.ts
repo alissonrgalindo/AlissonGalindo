@@ -6,7 +6,7 @@ const ptBR = {
     linkedinLink: "Linkedin",
     orText: "ou",
     downloadCV: "Baixe meu CV",
-    location: "morando na ensolarada cidade do Caruaru, Pernambuco - Brasil"
+    location: "morando na ensolarada cidade de Pernambuco - Brasil"
   },
   meta: {
     title: "Alison Galindo",

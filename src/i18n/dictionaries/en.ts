@@ -6,7 +6,7 @@ const en = {
     linkedinLink: "LinkedIn",
     orText: "or",
     downloadCV: "download my CV",
-    location: "based in the sunny city of Caruaru, Pernambuco - Brazil",
+    location: "based in a sunny city of Pernambuco - Brazil",
   },
   meta: {
     title: "Alison Galindo",
