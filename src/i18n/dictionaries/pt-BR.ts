@@ -1,3 +1,4 @@
+// src/i18n/dictionaries/pt-BR.ts
 const ptBR = {
   hero: {
     title: "Alison Galindo",
@@ -15,7 +16,61 @@ const ptBR = {
   accessibility: {
     photoAlt: "Fotografia de Alison Galindo usando uma jaqueta preta e óculos",
     linkedinTitle: "Minha página de perfil no Linkedin."
-  }
+  },
+  navbar: {
+    home: "Início",
+    admin: "Painel Admin",
+  },
+  admin: {
+    title: "Painel de Administração",
+    description: "Gerencie documentos e teste o sistema RAG (Recuperação Aumentada por Geração)",
+    tabs: {
+      chat: "Chat",
+      upload: "Enviar Documento",
+      documents: "Documentos",
+    }
+  },
+  chat: {
+    title: "Fale comigo",
+    placeholder: "Digite sua mensagem...",
+    sendButton: "Enviar",
+    loadingMessage: "Pensando...",
+  },
+  documents: {
+    title: "Gerenciar Documentos",
+    listTitle: "Documentos Cadastrados",
+    uploadTitle: "Enviar Novo Documento",
+    typeLabel: "Tipo de Documento",
+    nameLabel: "Nome do Documento",
+    sourceLabel: "Fonte",
+    uploadButton: "Enviar",
+    uploading: "Enviando...",
+    success: "Documento enviado com sucesso!",
+    error: "Erro ao enviar documento",
+    noDocuments: "Nenhum documento encontrado",
+    loading: "Carregando documentos...",
+    deleteButton: "Excluir",
+    deleteConfirm: "Tem certeza que deseja excluir este documento?",
+    deleteSuccess: "Documento excluído com sucesso!",
+    deleteError: "Erro ao excluir documento",
+    typeLabels: {
+      cv: "Currículo",
+      portfolio: "Portfólio",
+      project: "Projeto",
+      blog: "Blog",
+      github: "GitHub",
+      linkedin: "LinkedIn",
+      other: "Outro",
+    },
+    columns: {
+      title: "Título",
+      type: "Tipo",
+      source: "Fonte",
+      date: "Data",
+      chunks: "Fragmentos",
+      actions: "Ações",
+    },
+  },
 }
 
 export default ptBR

@@ -12,6 +12,7 @@ export async function POST(req: NextRequest) {
       );
     }
     
+    // Process the CV data
     const result = await processCVData(cvData);
     
     return NextResponse.json(result);
