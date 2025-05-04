@@ -35,6 +35,16 @@ export default function Hero({
               {hero.description}
               <a
                 className="font-bold pointer-events-auto"
+                href="https://codepen.io/AlisonGalindo"
+                title={accessibility.codepenTitle}
+                target="_blank"
+                rel="noopener"
+              >
+                &nbsp;{hero.codepenLink}&nbsp;
+              </a>
+              {hero.codepenLinkText}
+              <a
+                className="font-bold pointer-events-auto"
                 href="https://www.linkedin.com/in/alissonrgalindo/"
                 title={accessibility.linkedinTitle}
                 target="_blank"

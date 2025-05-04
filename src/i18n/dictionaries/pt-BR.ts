@@ -1,13 +1,14 @@
-// src/i18n/dictionaries/pt-BR.ts
 const ptBR = {
   hero: {
     title: "Alison Galindo",
     subtitle: "DESENVOLVEDOR FRONT-END CRIATIVO",
-    description: "Desenvolvedor profissional, apaixonado por tecnologia e formas sustentáveis de vida. Para informações detalhadas, confira meu",
+    description: "Desenvolvedor profissional, apaixonado por tecnologia e formas sustentáveis de vida. Confira meus experimentos de código no",
+    codepenLink: "CodePen",
+    codepenLinkText: ". Para informações detalhadas, confira meu",
     linkedinLink: "Linkedin",
     orText: "ou",
     downloadCV: "Baixe meu CV",
-    location: "morando na ensolarada cidade de Pernambuco - Brasil"
+    location: "morando em uma ensolarada cidade de Pernambuco - Brasil"
   },
   meta: {
     title: "Alison Galindo",
@@ -15,7 +16,8 @@ const ptBR = {
   },
   accessibility: {
     photoAlt: "Fotografia de Alison Galindo usando uma jaqueta preta e óculos",
-    linkedinTitle: "Minha página de perfil no Linkedin."
+    linkedinTitle: "Minha página de perfil no Linkedin.",
+    codepenTitle: "Confira meus experimentos no CodePen",
   },
   navbar: {
     home: "Início",
