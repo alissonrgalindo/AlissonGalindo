@@ -3,8 +3,6 @@ import { Open_Sans } from "next/font/google";
 import "@/app/globals.css";
 import { getTranslations } from "@/i18n/utils";
 import { Locale, locales } from "@/i18n/config";
-import Navbar from "@/components/Navbar";
-import { Dictionary } from "@/i18n/types";
 
 const openSans = Open_Sans({
   subsets: ["latin"],
@@ -16,9 +14,10 @@ const openSans = Open_Sans({
 export async function generateMetadata({ 
   params 
 }: { 
-  params: { lang: Locale }
+  params: Promise<{ lang: Locale }> 
 }): Promise<Metadata> {
-  const dictionary = await getTranslations(params.lang) as Dictionary;
+  const { lang } = await params;
+  const dictionary = await getTranslations(lang);
   
   return {
     title: dictionary.meta.title,
@@ -35,19 +34,16 @@ export default async function RootLayout({
   params,
 }: Readonly<{
   children: React.ReactNode;
-  params: { lang: Locale };
+  params: Promise<{ lang: Locale }>;
 }>) {
-  const dictionary = await getTranslations(params.lang) as Dictionary;
+  const { lang } = await params;
   
   return (
-    <html lang={params.lang}>
+    <html lang={lang}>
       <body
         className={`${openSans.variable} antialiased`}
       >
-        <Navbar locale={params.lang} dictionary={dictionary} />
-        <div className="pt-16">
-          {children}
-        </div>
+        {children}
       </body>
     </html>
   );
