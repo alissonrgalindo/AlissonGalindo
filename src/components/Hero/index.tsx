@@ -1,6 +1,5 @@
 import Image from "next/image";
 import Background from "@/components/Background";
-import PhotoOfMe from "@/assets/images/me.webp";
 import { Locale } from "@/i18n/config";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import en from "@/i18n/dictionaries/en";
@@ -75,7 +74,7 @@ export default function Hero({
           <Image
             priority
             className="relative max-w-full h-auto top-4"
-            src={PhotoOfMe}
+            src="/me.webp" 
             alt={accessibility.photoAlt}
             width={955}
             height={790}
