@@ -9,6 +9,8 @@ type BackgroundScope = {
   }
 }
 
+type DebouncedFunction<T extends (...args: unknown[]) => void> = (...args: Parameters<T>) => void;
+
 export default function Background() {
   const root = useRef<HTMLDivElement>(null)
   const scope = useRef<BackgroundScope>({ methods: {} })
@@ -18,9 +20,7 @@ export default function Background() {
   const [toggled, setToggled] = useState(false)
   const [isAnimating, setIsAnimating] = useState(false)
 
-  // Memoize the createGrid function to avoid recreating it on every render
   const createGrid = useCallback(() => {
-    // Adjust size based on screen width and device pixel ratio for better performance
     const baseSize = window.innerWidth > 800 ? 70 : 50
     const devicePixelRatio = window.devicePixelRatio || 1
     const size = Math.floor(baseSize * (1 / Math.min(devicePixelRatio, 2)))
@@ -32,10 +32,13 @@ export default function Background() {
     setRows(newRows)
   }, [])
 
-  // Debounce resize event for better performance
-  const debounce = (func: Function, wait: number) => {
+  const debounce = <T extends (...args: unknown[]) => void>(
+    func: T, 
+    wait: number
+  ): DebouncedFunction<T> => {
     let timeout: NodeJS.Timeout
-    return function executedFunction(...args: any[]) {
+    
+    return (...args: Parameters<T>) => {
       const later = () => {
         clearTimeout(timeout)
         func(...args)
@@ -79,7 +82,6 @@ export default function Background() {
       })
     }
 
-    // Trigger initial animation
     setTimeout(() => {
       scope.current?.methods?.animateTiles?.(0, false)
     }, 300)
@@ -95,7 +97,6 @@ export default function Background() {
     scope.current?.methods?.animateTiles?.(index, nextToggle)
   }
 
-  // Handle keyboard interaction for accessibility
   const handleKeyDown = (e: React.KeyboardEvent, index: number) => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault()

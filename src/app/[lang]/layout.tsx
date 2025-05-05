@@ -18,10 +18,65 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { lang } = await params;
   const dictionary = await getTranslations(lang);
+  const canonicalUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://alisongalindo.com";
   
   return {
-    title: dictionary.meta.title,
+    title: {
+      default: dictionary.meta.title,
+      template: `%s | ${dictionary.meta.title}`,
+    },
     description: dictionary.meta.description,
+    metadataBase: new URL(canonicalUrl),
+    alternates: {
+      canonical: '/',
+      languages: {
+        'en': '/en',
+        'pt-BR': '/pt-BR',
+        'x-default': '/',
+      },
+    },
+    openGraph: {
+      type: 'website',
+      locale: lang === 'en' ? 'en_US' : 'pt_BR',
+      url: canonicalUrl,
+      title: dictionary.meta.title,
+      description: dictionary.meta.description,
+      siteName: 'Alison Galindo',
+      images: [
+        {
+          url: '/assets/images/og-image.jpg',
+          width: 1200,
+          height: 630,
+          alt: dictionary.accessibility.photoAlt,
+        }
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: dictionary.meta.title,
+      description: dictionary.meta.description,
+      images: ['/assets/images/og-image.jpg'],
+    },
+    icons: {
+      icon: '/favicon.ico',
+      shortcut: '/favicon-16x16.png',
+      apple: '/apple-touch-icon.png',
+    },
+    themeColor: [
+      { media: '(prefers-color-scheme: light)', color: '#ffffff' },
+      { media: '(prefers-color-scheme: dark)', color: '#0a0a0a' },
+    ],
+    manifest: '/site.webmanifest',
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+      },
+    },
   };
 }
 
@@ -39,9 +94,9 @@ export default async function RootLayout({
   const { lang } = await params;
   
   return (
-    <html lang={lang}>
+    <html lang={lang} suppressHydrationWarning>
       <body
-        className={`${openSans.variable} antialiased`}
+        className={`${openSans.variable} font-sans antialiased`}
       >
         {children}
       </body>
