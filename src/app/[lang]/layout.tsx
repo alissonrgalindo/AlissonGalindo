@@ -3,6 +3,7 @@ import { Open_Sans } from "next/font/google";
 import "@/app/globals.css";
 import { getTranslations } from "@/i18n/utils";
 import { Locale, locales } from "@/i18n/config";
+import { Analytics } from "@vercel/analytics/react"
 
 const openSans = Open_Sans({
   subsets: ["latin"],
@@ -99,6 +100,7 @@ export default async function RootLayout({
         className={`${openSans.variable} font-sans antialiased`}
       >
         {children}
+        <Analytics />
       </body>
     </html>
   );
