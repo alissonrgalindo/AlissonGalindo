@@ -1,4 +1,3 @@
-// src/i18n/types.ts
 export interface DocumentTypeLabels {
   cv: string;
   portfolio: string;
@@ -66,12 +65,15 @@ export interface NavbarDictionary {
 export interface AccessibilityDictionary {
   photoAlt: string;
   linkedinTitle: string;
+  codepenTitle: string;
 }
 
 export interface HeroDictionary {
   title: string;
   subtitle: string;
   description: string;
+  codepenLink: string;
+  codepenLinkText: string;
   linkedinLink: string;
   orText: string;
   downloadCV: string;
