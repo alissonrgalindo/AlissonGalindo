@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef, useState, useCallback } from "react"
+import { useEffect, useRef, useState, useCallback, memo } from "react"
 import { animate, stagger, createSpring } from "animejs"
 
 type BackgroundScope = {
@@ -11,9 +11,46 @@ type BackgroundScope = {
 
 type DebouncedFunction<T extends (...args: unknown[]) => void> = (...args: Parameters<T>) => void;
 
+const Tile = memo(({ 
+  index, 
+  onClick, 
+  onKeyDown 
+}: { 
+  index: number; 
+  onClick: () => void; 
+  onKeyDown: (e: React.KeyboardEvent) => void 
+}) => {
+  return (
+    <div
+      className="tile outline-1 outline-transparent transition-opacity duration-300"
+      onClick={onClick}
+      onKeyDown={onKeyDown}
+      tabIndex={0}
+      role="button"
+      aria-label={`Grid tile ${index + 1}`}
+    />
+  );
+});
+
+Tile.displayName = 'Tile';
+
+// Custom hook for debouncing functions
+function useDebounce<T extends (...args: unknown[]) => void>(func: T, wait: number): DebouncedFunction<T> {
+  const timeout = useRef<NodeJS.Timeout | null>(null);
+  
+  return useCallback((...args: Parameters<T>) => {
+    if (timeout.current) clearTimeout(timeout.current);
+    
+    timeout.current = setTimeout(() => {
+      func(...args);
+    }, wait);
+  }, [func, wait]);
+}
+
 export default function Background() {
   const root = useRef<HTMLDivElement>(null)
   const scope = useRef<BackgroundScope>({ methods: {} })
+  const animationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const [columns, setColumns] = useState(0)
   const [rows, setRows] = useState(0)
@@ -32,25 +69,33 @@ export default function Background() {
     setRows(newRows)
   }, [])
 
-  const debounce = <T extends (...args: unknown[]) => void>(
-    func: T, 
-    wait: number
-  ): DebouncedFunction<T> => {
-    let timeout: NodeJS.Timeout
+  const debouncedCreateGrid = useDebounce(createGrid, 250)
+
+  const animateTiles = useCallback((index: number, toggled: boolean) => {
+    if (isAnimating) return
+    setIsAnimating(true)
     
-    return (...args: Parameters<T>) => {
-      const later = () => {
-        clearTimeout(timeout)
-        func(...args)
-      }
-      clearTimeout(timeout)
-      timeout = setTimeout(later, wait)
+    const tiles = document.querySelectorAll(".tile")
+    if (!tiles || tiles.length === 0) {
+      setIsAnimating(false)
+      return
     }
-  }
+
+    animate(".tile", {
+      backgroundColor: toggled ? "#000" : "#fff",
+      delay: stagger(50, {
+        grid: [columns, rows],
+        from: index,
+      }),
+      duration: 600,
+      ease: createSpring({ stiffness: 80 }),
+      complete: () => {
+        setIsAnimating(false)
+      }
+    })
+  }, [columns, rows, isAnimating])
 
   useEffect(() => {
-    const debouncedCreateGrid = debounce(createGrid, 250)
-    
     createGrid()
     window.addEventListener("resize", debouncedCreateGrid)
 
@@ -58,51 +103,45 @@ export default function Background() {
       scope.current.methods = {}
     }
 
-    scope.current.methods.animateTiles = (index: number, toggled: boolean) => {
-      if (isAnimating) return
-      setIsAnimating(true)
-      
-      const tiles = document.querySelectorAll(".tile")
-      if (!tiles || tiles.length === 0) {
-        setIsAnimating(false)
-        return
-      }
+    scope.current.methods.animateTiles = animateTiles;
 
-      animate(".tile", {
-        backgroundColor: toggled ? "#000" : "#fff",
-        delay: stagger(50, {
-          grid: [columns, rows],
-          from: index,
-        }),
-        duration: 600,
-        ease: createSpring({ stiffness: 80 }),
-        complete: () => {
-          setIsAnimating(false)
-        }
-      })
-    }
-
-    setTimeout(() => {
+    animationTimeoutRef.current = setTimeout(() => {
       scope.current?.methods?.animateTiles?.(0, false)
     }, 300)
 
-    return () => window.removeEventListener("resize", debouncedCreateGrid)
-  }, [columns, rows, createGrid, isAnimating])
+    return () => {
+      window.removeEventListener("resize", debouncedCreateGrid)
+      if (animationTimeoutRef.current) {
+        clearTimeout(animationTimeoutRef.current)
+      }
+    }
+  }, [createGrid, debouncedCreateGrid, animateTiles])
 
-  const handleTileClick = (index: number) => {
+  const handleTileClick = useCallback((index: number) => {
     if (isAnimating) return
     
     const nextToggle = !toggled
     setToggled(nextToggle)
     scope.current?.methods?.animateTiles?.(index, nextToggle)
-  }
+  }, [isAnimating, toggled, animateTiles])
 
-  const handleKeyDown = (e: React.KeyboardEvent, index: number) => {
+  const handleKeyDown = useCallback((e: React.KeyboardEvent, index: number) => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault()
       handleTileClick(index)
     }
-  }
+  }, [handleTileClick])
+
+  const gridItems = useCallback(() => {
+    return Array.from({ length: columns * rows }).map((_, i) => (
+      <Tile
+        key={i}
+        index={i}
+        onClick={() => handleTileClick(i)}
+        onKeyDown={(e) => handleKeyDown(e, i)}
+      />
+    ))
+  }, [columns, rows, handleTileClick, handleKeyDown])
 
   return (
     <div
@@ -115,17 +154,7 @@ export default function Background() {
       aria-label="Interactive background grid"
       role="presentation"
     >
-      {Array.from({ length: columns * rows }).map((_, i) => (
-        <div
-          key={i}
-          className="tile outline-1 outline-transparent transition-opacity duration-300 hover:opacity-70"
-          onClick={() => handleTileClick(i)}
-          onKeyDown={(e) => handleKeyDown(e, i)}
-          tabIndex={0}
-          role="button"
-          aria-label={`Grid tile ${i + 1}`}
-        />
-      ))}
+      {gridItems()}
     </div>
   )
 }
