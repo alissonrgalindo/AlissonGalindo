@@ -1,7 +1,8 @@
 import { getTranslations } from "@/i18n/utils";
 import Hero from "@/components/Hero";
-import { Locale } from "@/i18n/config";
+import { Locale, defaultLocale } from "@/i18n/config";
 import { Suspense } from "react";
+import en from "@/i18n/dictionaries/en";  // Import default dictionary as fallback
 
 function Loading() {
   return (
@@ -16,12 +17,39 @@ export default async function Home({
 }: {
   params: Promise<{ lang: Locale }>;
 }) {
-  const { lang } = await params;
-  const dictionary = await getTranslations(lang);
-  
-  return (
-    <Suspense fallback={<Loading />}>
-      <Hero lang={lang} dictionary={dictionary} />
-    </Suspense>
-  );
+  try {
+    // Properly await the params object before destructuring
+    const { lang } = await params;
+    
+    // Get translations with error handling
+    let dictionary;
+    try {
+      dictionary = await getTranslations(lang);
+      console.log(`Page: Got dictionary for ${lang}`, dictionary ? "Found" : "Not found");
+    } catch (error) {
+      console.error(`Error getting translations for ${lang}:`, error);
+      dictionary = en; // Fallback to English dictionary
+    }
+    
+    // If dictionary is still undefined, use English as fallback
+    if (!dictionary) {
+      console.warn(`Using fallback dictionary for page (lang: ${lang})`);
+      dictionary = en;
+    }
+    
+    return (
+      <Suspense fallback={<Loading />}>
+        <Hero lang={lang} dictionary={dictionary} />
+      </Suspense>
+    );
+  } catch (error) {
+    console.error("Error in Home page:", error);
+    
+    // Return fallback content in case of errors
+    return (
+      <Suspense fallback={<Loading />}>
+        <Hero lang={defaultLocale} dictionary={en} />
+      </Suspense>
+    );
+  }
 }
