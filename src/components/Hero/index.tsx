@@ -23,7 +23,7 @@ export default function Hero({
       <LanguageSwitcher currentLocale={lang} />
       <main
         id="main-content"
-        className="relative pointer-events-none max-w-[1200px] h-screen px-4 md:px-8 py-10 mx-auto grid grid-cols-1 md:grid-cols-[1fr_550px] gap-6 md:gap-12 z-10"
+        className="flex flex-col-reverse justify-end relative pointer-events-none max-w-[1200px] h-screen px-4 md:px-8 py-10 mx-auto md:grid md:grid-cols-1 md:grid-cols-[1fr_550px] gap-6 md:gap-12 z-10"
         aria-labelledby="hero-title"
       >
         <div className="flex flex-col justify-center py-10 md:py-0 select-none text-white">

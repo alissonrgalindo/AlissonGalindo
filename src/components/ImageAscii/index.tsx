@@ -231,8 +231,8 @@ export default function AsciiConverter() {
   };
 
   return (
-    <div className="min-h-screen w-full ">
-      <div className="flex flex-col lg:flex-row min-h-screen w-full overflow-hidden ">
+    <div className="w-full">
+      <div className="flex flex-col lg:flex-row w-full overflow-hidden ">
         {/* ASCII Art Preview */}
         <div className="flex-1 flex items-center justify-center overflow-hidden">
           {loading ? (
@@ -250,7 +250,7 @@ export default function AsciiConverter() {
               className="select-text mix-blend-difference"
               style={{
                 width: "80dvw",
-                height: "80dvh",
+                height: "auto",
                 fontSize: "1rem", 
                 lineHeight: "1rem",
                 fontFamily: "monospace",
