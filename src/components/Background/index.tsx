@@ -1,160 +1,216 @@
-"use client"
+"use client";
 
-import { useEffect, useRef, useState, useCallback, memo } from "react"
-import { animate, stagger, createSpring } from "animejs"
+import { useEffect, useRef, useState } from "react";
+import gsap from "gsap";
 
-type BackgroundScope = {
-  methods?: {
-    animateTiles?: (index: number, toggled: boolean) => void
-  }
+interface BackgroundProps {
+  cellSize?: number;
+  depth?: number;
 }
 
-type DebouncedFunction<T extends (...args: unknown[]) => void> = (...args: Parameters<T>) => void;
-
-const Tile = memo(({ 
-  index, 
-  onClick, 
-  onKeyDown 
-}: { 
-  index: number; 
-  onClick: () => void; 
-  onKeyDown: (e: React.KeyboardEvent) => void 
-}) => {
-  return (
-    <div
-      className="tile outline-1 outline-transparent transition-opacity duration-300"
-      onClick={onClick}
-      onKeyDown={onKeyDown}
-      tabIndex={0}
-      role="button"
-      aria-label={`Grid tile ${index + 1}`}
-    />
-  );
-});
-
-Tile.displayName = 'Tile';
-
-// Custom hook for debouncing functions
-function useDebounce<T extends (...args: unknown[]) => void>(func: T, wait: number): DebouncedFunction<T> {
-  const timeout = useRef<NodeJS.Timeout | null>(null);
-  
-  return useCallback((...args: Parameters<T>) => {
-    if (timeout.current) clearTimeout(timeout.current);
-    
-    timeout.current = setTimeout(() => {
-      func(...args);
-    }, wait);
-  }, [func, wait]);
-}
-
-export default function Background() {
-  const root = useRef<HTMLDivElement>(null)
-  const scope = useRef<BackgroundScope>({ methods: {} })
-  const animationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-  const [columns, setColumns] = useState(0)
-  const [rows, setRows] = useState(0)
-  const [toggled, setToggled] = useState(false)
-  const [isAnimating, setIsAnimating] = useState(false)
-
-  const createGrid = useCallback(() => {
-    const baseSize = window.innerWidth > 800 ? 70 : 50
-    const devicePixelRatio = window.devicePixelRatio || 1
-    const size = Math.floor(baseSize * (1 / Math.min(devicePixelRatio, 2)))
-    
-    const newColumns = Math.floor(window.innerWidth / size)
-    const newRows = Math.floor(window.innerHeight / size)
-    
-    setColumns(newColumns)
-    setRows(newRows)
-  }, [])
-
-  const debouncedCreateGrid = useDebounce(createGrid, 250)
-
-  const animateTiles = useCallback((index: number, toggled: boolean) => {
-    if (isAnimating) return
-    setIsAnimating(true)
-    
-    const tiles = document.querySelectorAll(".tile")
-    if (!tiles || tiles.length === 0) {
-      setIsAnimating(false)
-      return
-    }
-
-    animate(".tile", {
-      backgroundColor: toggled ? "#000" : "#fff",
-      delay: stagger(50, {
-        grid: [columns, rows],
-        from: index,
-      }),
-      duration: 600,
-      ease: createSpring({ stiffness: 80 }),
-      complete: () => {
-        setIsAnimating(false)
-      }
-    })
-  }, [columns, rows, isAnimating])
+export default function Background({
+  cellSize = 50,
+  depth = 80,
+}: BackgroundProps) {
+  const gridRef = useRef<HTMLDivElement>(null);
+  const [dimensions, setDimensions] = useState({ rows: 15, columns: 15 });
 
   useEffect(() => {
-    createGrid()
-    window.addEventListener("resize", debouncedCreateGrid)
+    const calculateDimensions = () => {
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+      const columns = Math.ceil(width / cellSize) + 2;
+      const rows = Math.ceil(height / cellSize) + 2;
+      setDimensions({ rows, columns });
+    };
 
-    if (!scope.current.methods) {
-      scope.current.methods = {}
-    }
+    calculateDimensions();
+    window.addEventListener("resize", calculateDimensions);
 
-    scope.current.methods.animateTiles = animateTiles;
+    return () => window.removeEventListener("resize", calculateDimensions);
+  }, [cellSize]);
 
-    animationTimeoutRef.current = setTimeout(() => {
-      scope.current?.methods?.animateTiles?.(0, false)
-    }, 300)
+  useEffect(() => {
+    if (!gridRef.current) return;
+
+    const cells = gridRef.current.querySelectorAll(".grid-cell");
+    const { rows, columns } = dimensions;
+
+    cells.forEach((cell, index) => {
+      cell.addEventListener("mouseenter", () => {
+        gsap.to(cell, {
+          z: -depth * 1.5,
+          rotationX: Math.random() * 20 - 10,
+          rotationY: Math.random() * 20 - 10,
+          scale: 0.8,
+          duration: 0.2,
+          ease: "power3.out",
+        });
+
+        const cellIndex = index;
+        const row = Math.floor(cellIndex / columns);
+        const col = cellIndex % columns;
+
+        for (let r = -2; r <= 2; r++) {
+          for (let c = -2; c <= 2; c++) {
+            const neighborRow = row + r;
+            const neighborCol = col + c;
+            if (
+              neighborRow >= 0 &&
+              neighborRow < rows &&
+              neighborCol >= 0 &&
+              neighborCol < columns
+            ) {
+              const neighborIndex = neighborRow * columns + neighborCol;
+              const neighborCell = cells[neighborIndex];
+              if (neighborCell && neighborCell !== cell) {
+                const distance = Math.sqrt(r * r + c * c);
+                const intensity = Math.max(0, 1 - distance / 3);
+
+                gsap.to(neighborCell, {
+                  z: -depth * intensity * 0.7,
+                  rotationX: (Math.random() - 0.5) * 15 * intensity,
+                  rotationY: (Math.random() - 0.5) * 15 * intensity,
+                  scale: 1 - 0.2 * intensity,
+                  duration: 0.3,
+                  ease: "power2.out",
+                });
+              }
+            }
+          }
+        }
+      });
+
+      cell.addEventListener("mouseleave", () => {
+        gsap.to(cell, {
+          z: 0,
+          rotationX: 0,
+          rotationY: 0,
+          scale: 1,
+          duration: 0.8,
+          ease: "elastic.out(1, 0.4)",
+        });
+      });
+    });
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const { clientX, clientY } = e;
+
+      cells.forEach((cell) => {
+        const rect = cell.getBoundingClientRect();
+        const cellX = rect.left + rect.width / 2;
+        const cellY = rect.top + rect.height / 2;
+
+        const distX = clientX - cellX;
+        const distY = clientY - cellY;
+        const distance = Math.sqrt(distX * distX + distY * distY);
+
+        const maxDistance = 300;
+        if (distance < maxDistance) {
+          const intensity = 1 - distance / maxDistance;
+          const zDepth = -depth * intensity * 1.2;
+
+          const angle = Math.atan2(distY, distX);
+          const rotationX = Math.sin(angle) * 25 * intensity;
+          const rotationY = Math.cos(angle) * 25 * intensity;
+
+          gsap.to(cell, {
+            z: zDepth,
+            rotationX: rotationX,
+            rotationY: rotationY,
+            scale: 1 - 0.3 * intensity,
+            duration: 0.4,
+            ease: "power3.out",
+          });
+        } else {
+          gsap.to(cell, {
+            z: 0,
+            rotationX: 0,
+            rotationY: 0,
+            scale: 1,
+            duration: 0.6,
+            ease: "power2.out",
+          });
+        }
+      });
+    };
+
+    const handleClick = (e: MouseEvent) => {
+      const { clientX, clientY } = e;
+
+      cells.forEach((cell) => {
+        const rect = cell.getBoundingClientRect();
+        const cellX = rect.left + rect.width / 2;
+        const cellY = rect.top + rect.height / 2;
+
+        const distX = clientX - cellX;
+        const distY = clientY - cellY;
+        const distance = Math.sqrt(distX * distX + distY * distY);
+
+        const maxDistance = 400;
+        if (distance < maxDistance) {
+          const intensity = 1 - distance / maxDistance;
+
+          gsap.to(cell, {
+            z: -depth * intensity * 2,
+            rotationX: (Math.random() - 0.5) * 60 * intensity,
+            rotationY: (Math.random() - 0.5) * 60 * intensity,
+            scale: 0.5 + 0.5 * intensity,
+            duration: 0.1,
+            ease: "power4.out",
+            onComplete: () => {
+              gsap.to(cell, {
+                z: 0,
+                rotationX: 0,
+                rotationY: 0,
+                scale: 1,
+                duration: 1.2,
+                ease: "elastic.out(1, 0.3)",
+              });
+            },
+          });
+        }
+      });
+    };
+
+    document.addEventListener("mousemove", handleMouseMove);
+    document.addEventListener("click", handleClick);
 
     return () => {
-      window.removeEventListener("resize", debouncedCreateGrid)
-      if (animationTimeoutRef.current) {
-        clearTimeout(animationTimeoutRef.current)
-      }
-    }
-  }, [createGrid, debouncedCreateGrid, animateTiles])
-
-  const handleTileClick = useCallback((index: number) => {
-    if (isAnimating) return
-    
-    const nextToggle = !toggled
-    setToggled(nextToggle)
-    scope.current?.methods?.animateTiles?.(index, nextToggle)
-  }, [isAnimating, toggled, animateTiles])
-
-  const handleKeyDown = useCallback((e: React.KeyboardEvent, index: number) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault()
-      handleTileClick(index)
-    }
-  }, [handleTileClick])
-
-  const gridItems = useCallback(() => {
-    return Array.from({ length: columns * rows }).map((_, i) => (
-      <Tile
-        key={i}
-        index={i}
-        onClick={() => handleTileClick(i)}
-        onKeyDown={(e) => handleKeyDown(e, i)}
-      />
-    ))
-  }, [columns, rows, handleTileClick, handleKeyDown])
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("click", handleClick);
+    };
+  }, [depth, dimensions]);
 
   return (
-    <div
-      ref={root}
-      className="absolute top-0 left-0 w-screen h-screen grid overflow-hidden"
-      style={{
-        gridTemplateColumns: `repeat(${columns}, 1fr)`,
-        gridTemplateRows: `repeat(${rows}, 1fr)`,
-      }}
-      aria-label="Interactive background grid"
-      role="presentation"
-    >
-      {gridItems()}
+    <div className="fixed inset-0 w-full h-full bg-zinc-900 overflow-hidden -z-10">
+      <div
+        ref={gridRef}
+        className="grid w-full h-full"
+        style={{
+          gridTemplateColumns: `repeat(${dimensions.columns}, ${cellSize}px)`,
+          gridTemplateRows: `repeat(${dimensions.rows}, ${cellSize}px)`,
+          perspective: "800px",
+          perspectiveOrigin: "center center",
+          justifyContent: "center",
+          alignContent: "center",
+        }}
+      >
+        {Array.from({ length: dimensions.rows * dimensions.columns }).map(
+          (_, index) => (
+            <div
+              key={index}
+              className="grid-cell border border-zinc-950 transition-colors hover:border-zinc-950 bg-zinc-950"
+              style={{
+                width: `${cellSize}px`,
+                height: `${cellSize}px`,
+                transformStyle: "preserve-3d",
+                transformOrigin: "center center",
+              }}
+            />
+          )
+        )}
+      </div>
     </div>
-  )
+  );
 }

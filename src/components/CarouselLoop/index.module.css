@@ -1,0 +1,34 @@
+.scroller {
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  mask-image: linear-gradient(90deg, transparent, white 5%, white 95%, transparent);
+  -webkit-mask-image: linear-gradient(90deg, transparent, white 5%, white 95%, transparent);
+}
+
+.inner {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--_gap, 16px);
+  padding: 1rem 0;
+}
+
+.scroller[data-animated="true"] .inner {
+  flex-wrap: nowrap;
+  width: max-content;
+  animation: scroll var(--_animation-duration, 40s)
+             var(--_animation-direction, forwards)
+             linear infinite;
+  animation-play-state: running;
+  transition: animation-play-state 0.5s ease;
+}
+
+.scroller[data-animated="true"]:hover .inner {
+  animation-play-state: paused;
+}
+
+@keyframes scroll {
+  to {
+    transform: translate(calc(-50% - var(--_gap, 16px) / 2));
+  }
+}
