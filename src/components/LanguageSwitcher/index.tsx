@@ -67,8 +67,8 @@ export default function LanguageSwitcher({
             className={`
               px-3 py-1.5 rounded text-sm font-medium transition-all duration-300 
               ${isActive 
-                ? "bg-black text-white shadow-md" 
-                : "bg-white text-black border border-black hover:bg-gray-100"
+                ? "bg-orange-400 text-white shadow-md" 
+                : "bg-black text-white border border-zinc-800 hover:bg-gray-100"
               }
             `}
             onClick={(e) => {

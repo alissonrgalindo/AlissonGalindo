@@ -1,14 +1,15 @@
 const ptBR = {
   hero: {
     title: "Alison Galindo",
-    subtitle: "DESENVOLVEDOR FRONT-END CRIATIVO",
-    description: "Desenvolvedor profissional, apaixonado por tecnologia e formas sustentáveis de vida. Confira meus experimentos de código no",
+    subtitle: "Front end developer",
+    description: "Desenvolvedor Front-end com 13+ anos de experiência em JavaScript e UI/UX. Minha stack principal atualmente é React com TypeScript. Confira meus experimentos de código no",
     codepenLink: "CodePen",
     codepenLinkText: ". Para informações detalhadas, confira meu",
     linkedinLink: "Linkedin",
     orText: "ou",
     downloadCV: "Baixe meu CV",
-    location: "morando em uma ensolarada cidade de Pernambuco - Brasil"
+    location: "morando em uma ensolarada cidade de Pernambuco - Brasil",
+    years: "anos de experiência"
   },
   meta: {
     title: "Alison Galindo",

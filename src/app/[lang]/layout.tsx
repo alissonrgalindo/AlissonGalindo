@@ -97,7 +97,7 @@ export default async function RootLayout({
   return (
     <html lang={lang} suppressHydrationWarning>
       <body
-        className={`${openSans.variable} font-sans antialiased`}
+        className={`${openSans.variable} font-sans antialiased overflow-x-hidden`}
       >
         {children}
         <Analytics />

@@ -1,14 +1,15 @@
 const en = {
   hero: {
     title: "Alison Galindo",
-    subtitle: "Creative Developer",
-    description: "Professional developer, in love with technology and sustainable ways of living. Check out my code experiments on",
+    subtitle: "Front end developer",
+    description: "Front-end developer with 13+ years of experience in JavaScript and UI/UX. My main stack nowadays is React with TypeScript. Check out my coding experiments on",
     codepenLink: "CodePen",
     codepenLinkText: ". For detailed information, please check my ",
     linkedinLink: "LinkedIn",
     orText: "or",
     downloadCV: "download my CV",
     location: "based in a sunny city of Pernambuco - Brazil",
+    years: "years of experience"
   },
   meta: {
     title: "Alison Galindo",
