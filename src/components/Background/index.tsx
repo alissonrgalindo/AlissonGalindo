@@ -36,8 +36,11 @@ export default function Background({
     const cells = gridRef.current.querySelectorAll(".grid-cell");
     const { rows, columns } = dimensions;
 
+    const enterHandlers: Array<(e: Event) => void> = [];
+    const leaveHandlers: Array<(e: Event) => void> = [];
+
     cells.forEach((cell, index) => {
-      cell.addEventListener("mouseenter", () => {
+      const onMouseEnter = () => {
         gsap.to(cell, {
           z: -depth * 1.5,
           rotationX: Math.random() * 20 - 10,
@@ -79,9 +82,9 @@ export default function Background({
             }
           }
         }
-      });
+      };
 
-      cell.addEventListener("mouseleave", () => {
+      const onMouseLeave = () => {
         gsap.to(cell, {
           z: 0,
           rotationX: 0,
@@ -90,7 +93,12 @@ export default function Background({
           duration: 0.8,
           ease: "elastic.out(1, 0.4)",
         });
-      });
+      };
+
+      cell.addEventListener("mouseenter", onMouseEnter);
+      cell.addEventListener("mouseleave", onMouseLeave);
+      enterHandlers.push(onMouseEnter);
+      leaveHandlers.push(onMouseLeave);
     });
 
     const handleMouseMove = (e: MouseEvent) => {
@@ -179,6 +187,10 @@ export default function Background({
     return () => {
       document.removeEventListener("mousemove", handleMouseMove);
       document.removeEventListener("click", handleClick);
+      cells.forEach((cell, idx) => {
+        cell.removeEventListener("mouseenter", enterHandlers[idx]);
+        cell.removeEventListener("mouseleave", leaveHandlers[idx]);
+      });
     };
   }, [depth, dimensions]);
 
