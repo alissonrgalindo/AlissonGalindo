@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Open_Sans } from "next/font/google";
 import "@/app/globals.css";
 import { getTranslations } from "@/i18n/utils";
@@ -12,13 +12,13 @@ const openSans = Open_Sans({
   display: "swap",
 });
 
-export async function generateMetadata({ 
-  params 
-}: { 
-  params: Promise<{ lang: Locale }> 
+export async function generateMetadata({
+  params
+}: {
+  params: Promise<{ lang: string }>
 }): Promise<Metadata> {
   const { lang } = await params;
-  const dictionary = await getTranslations(lang);
+  const dictionary = await getTranslations(lang as Locale);
   const canonicalUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://alisongalindo.com";
   
   return {
@@ -63,10 +63,6 @@ export async function generateMetadata({
       shortcut: '/favicon-16x16.png',
       apple: '/apple-touch-icon.png',
     },
-    themeColor: [
-      { media: '(prefers-color-scheme: light)', color: '#ffffff' },
-      { media: '(prefers-color-scheme: dark)', color: '#0a0a0a' },
-    ],
     manifest: '/site.webmanifest',
     robots: {
       index: true,
@@ -81,6 +77,13 @@ export async function generateMetadata({
   };
 }
 
+export const viewport: Viewport = {
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#ffffff' },
+    { media: '(prefers-color-scheme: dark)', color: '#0a0a0a' },
+  ],
+};
+
 export async function generateStaticParams() {
   return locales.map(lang => ({ lang }));
 }
@@ -90,9 +93,9 @@ export default async function RootLayout({
   params,
 }: Readonly<{
   children: React.ReactNode;
-  params: Promise<{ lang: Locale }>;
+  params: Promise<{ lang: string }>;
 }>) {
-  const { lang } = await params;
+  const { lang } = await params as { lang: Locale };
   
   return (
     <html lang={lang} suppressHydrationWarning>

@@ -22,7 +22,7 @@ function pathnameHasValidLocale(pathname: string): boolean {
   return segments.length > 1 && isValidLocale(segments[1]);
 }
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
   
   if (
